@@ -62,12 +62,12 @@
     "type": "equipment_line",
     "named": true,
     "fields": {
-      "value": {
+      "name": {
         "multiple": false,
         "required": true,
         "types": [
           {
-            "type": "equipment_text",
+            "type": "ingredient_name",
             "named": true
           }
         ]
@@ -75,9 +75,20 @@
     }
   },
   {
-    "type": "equipment_text",
+    "type": "equipment_ref",
     "named": true,
-    "fields": {}
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "file",
@@ -387,6 +398,10 @@
       "required": true,
       "types": [
         {
+          "type": "equipment_ref",
+          "named": true
+        },
+        {
           "type": "ingredient_ref",
           "named": true
         },
@@ -523,10 +538,6 @@
     "fields": {}
   },
   {
-    "type": "!",
-    "named": false
-  },
-  {
     "type": "(",
     "named": false
   },
@@ -548,6 +559,10 @@
   },
   {
     "type": "<",
+    "named": false
+  },
+  {
+    "type": "<!",
     "named": false
   },
   {

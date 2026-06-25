@@ -78,7 +78,24 @@ bool tree_sitter_neep_external_scanner_scan(void *payload, TSLexer *lexer,
       break;
     }
 
-    if (c == '!') { meta = true; break; }          // equipment line
+    if (c == '<') {
+      // A metadata equipment declaration is a line that is just `<!...>`;
+      // anything more (or a `<ingredient>`/`<+sub>` ref) makes it a step.
+      lexer->advance(lexer, false);
+      if (lexer->lookahead == '!') {
+        lexer->advance(lexer, false);
+        while (lexer->lookahead != 0 && !is_eol(lexer->lookahead) &&
+               lexer->lookahead != '>') {
+          lexer->advance(lexer, false);
+        }
+        if (lexer->lookahead == '>') {
+          lexer->advance(lexer, false);
+          while (is_space(lexer->lookahead)) lexer->advance(lexer, false);
+          meta = is_eol(lexer->lookahead) || lexer->lookahead == 0;
+        }
+      }
+      break;
+    }
     meta = looks_like_kv(lexer);
     break;
   }

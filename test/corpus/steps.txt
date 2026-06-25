@@ -20,6 +20,21 @@ Add [75%flour]<water> and <salt>, then <+poolish>.
       (literal))))
 
 ==================
+Equipment reference
+==================
+Preheat the <!dutch oven> for @1h.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (equipment_ref
+        name: (ingredient_name))
+      (literal)
+      (timer)
+      (literal))))
+
+==================
 Timers (simple and range)
 ==================
 Rest @30m then @2-3h.

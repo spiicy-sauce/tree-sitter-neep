@@ -83,12 +83,13 @@ module.exports = grammar({
       $.blank_line,
     )),
 
+    // <!dutch oven>  — the same equipment reference used in steps.
     equipment_line: $ => seq(
-      '!',
-      field('value', $.equipment_text),
+      '<!',
+      field('name', $.ingredient_name),
+      '>',
       $._eol,
     ),
-    equipment_text: $ => /[^\r\n]+/,
 
     kv_line: $ => seq(
       field('key', $.key),
@@ -165,24 +166,31 @@ module.exports = grammar({
 
     // The amount inside `[...]` is classified by the grammar, not re-parsed
     // downstream:
-    //   `80%*flour` → basis_member   (a constituent share of a basis)
-    //   `75%flour`  → basis_ref       (a percentage of a basis total)
-    //   `500g`, `2` → plain_amount    (a literal amount)
+    //   `80%*flour`  → basis_member   (a constituent share of a basis)
+    //   `75%flour`   → basis_ref      (a percentage of a basis total)
+    //   `3 cloves`,
+    //   `pinch`, `2` → plain_amount   (a literal amount)
+    //
+    // Canonically a plain amount is `<number> <unit>` (single space) or a
+    // bare unit (`pinch`); a number glued to its unit (`3cloves`) is accepted
+    // but warned about by the semantic layer and fixed by the formatter.
     amount_block: $ => seq('[', optional($._amount), ']'),
     _amount: $ => choice($.basis_member, $.basis_ref, $.plain_amount),
     _basis_amount: $ => choice($.basis_member, $.basis_ref),
 
+    // The percentage admits a missing integer part (`.5%`) or fractional part
+    // (`5.%`), as well as the usual `5%` / `5.5%`.
     basis_member: $ =>
-      token(prec(2, /[0-9]+(\.[0-9]*)?%\*[^\s()\[\]<>{}~*+!@%\/]+/)),
+      token(prec(2, /([0-9]+(\.[0-9]*)?|\.[0-9]+)%\*[^\s()\[\]<>{}~*+!@%\/]+/)),
     basis_ref: $ =>
-      token(prec(1, /[0-9]+(\.[0-9]*)?%[^\s()\[\]<>{}~*+!@%\/]+/)),
+      token(prec(1, /([0-9]+(\.[0-9]*)?|\.[0-9]+)%[^\s()\[\]<>{}~*+!@%\/]+/)),
     plain_amount: $ => token(/[^\]\r\n]+/),
 
     basis_name: $ => $._word,
     recipe_name: $ => $._word,
-    // The leading character may not be `+`, so that `<+name>` is unambiguously
-    // a sub-recipe reference rather than an ingredient named "+name".
-    ingredient_name: $ => token(/[^>\r\n+][^>\r\n]*/),
+    // The leading character may not be `+` or `!`, so that `<+name>` and
+    // `<!name>` are unambiguously sub-recipe and equipment references.
+    ingredient_name: $ => token(/[^>\r\n+!][^>\r\n]*/),
 
     mapping_group: $ => seq('(', $.mapping_list, ')'),
     mapping_list: $ => seq($.mapping, repeat(seq(',', $.mapping))),
@@ -216,6 +224,7 @@ module.exports = grammar({
     _prose_token: $ => choice(
       $.ingredient_with_amount,
       $.sub_recipe_ref,
+      $.equipment_ref,
       $.ingredient_ref,
       $.timer,
       $.target,
@@ -234,6 +243,13 @@ module.exports = grammar({
     sub_recipe_ref: $ => seq(
       '<+',
       field('name', $.recipe_name),
+      '>',
+    ),
+
+    // <!dutch oven>
+    equipment_ref: $ => seq(
+      '<!',
+      field('name', $.ingredient_name),
       '>',
     ),
 

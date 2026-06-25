@@ -6,8 +6,7 @@
 ; ── Metadata ─────────────────────────────────────────────────────────
 (kv_line key: (key) @property)
 (kv_line value: (value) @string)
-(equipment_line value: (equipment_text) @string)
-"!" @punctuation.special
+(equipment_line name: (ingredient_name) @type)
 
 ; ── Section headers / group labels ───────────────────────────────────
 (section_header title: (header_text) @markup.heading)
@@ -43,5 +42,6 @@
 ["(" ")"] @punctuation.bracket
 "<~" @punctuation.special
 "<+" @punctuation.special
+"<!" @punctuation.special
 ":" @punctuation.delimiter
 "," @punctuation.delimiter

@@ -13,7 +13,7 @@ Metadata-only file
 ==================
 title: T
 tags: a, b
-!dutch oven
+<!dutch oven>
 ------------------------------------------------------------------------
 (file
   (metadata_section
@@ -24,14 +24,14 @@ tags: a, b
       key: (key)
       value: (value))
     (equipment_line
-      value: (equipment_text))))
+      name: (ingredient_name))))
 
 ==================
 Full four-section document
 ==================
 title: T
 yield: 1 loaf
-!dutch oven
+<!dutch oven>
 ---
 [500g]<~flour>
 
@@ -53,7 +53,7 @@ Watch closely.
       key: (key)
       value: (value))
     (equipment_line
-      value: (equipment_text)))
+      name: (ingredient_name)))
   (ingredient_section
     (basis_decl
       amount: (amount_block

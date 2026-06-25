@@ -172,25 +172,25 @@
       "members": [
         {
           "type": "STRING",
-          "value": "!"
+          "value": "<!"
         },
         {
           "type": "FIELD",
-          "name": "value",
+          "name": "name",
           "content": {
             "type": "SYMBOL",
-            "name": "equipment_text"
+            "name": "ingredient_name"
           }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
         },
         {
           "type": "SYMBOL",
           "name": "_eol"
         }
       ]
-    },
-    "equipment_text": {
-      "type": "PATTERN",
-      "value": "[^\\r\\n]+"
     },
     "kv_line": {
       "type": "SEQ",
@@ -536,7 +536,7 @@
         "value": 2,
         "content": {
           "type": "PATTERN",
-          "value": "[0-9]+(\\.[0-9]*)?%\\*[^\\s()\\[\\]<>{}~*+!@%\\/]+"
+          "value": "([0-9]+(\\.[0-9]*)?|\\.[0-9]+)%\\*[^\\s()\\[\\]<>{}~*+!@%\\/]+"
         }
       }
     },
@@ -547,7 +547,7 @@
         "value": 1,
         "content": {
           "type": "PATTERN",
-          "value": "[0-9]+(\\.[0-9]*)?%[^\\s()\\[\\]<>{}~*+!@%\\/]+"
+          "value": "([0-9]+(\\.[0-9]*)?|\\.[0-9]+)%[^\\s()\\[\\]<>{}~*+!@%\\/]+"
         }
       }
     },
@@ -570,7 +570,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^>\\r\\n+][^>\\r\\n]*"
+        "value": "[^>\\r\\n+!][^>\\r\\n]*"
       }
     },
     "mapping_group": {
@@ -740,6 +740,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "equipment_ref"
+        },
+        {
+          "type": "SYMBOL",
           "name": "ingredient_ref"
         },
         {
@@ -798,6 +802,27 @@
           "content": {
             "type": "SYMBOL",
             "name": "recipe_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "equipment_ref": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<!"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
           }
         },
         {

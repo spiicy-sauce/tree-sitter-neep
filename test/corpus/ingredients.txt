@@ -53,6 +53,24 @@ title: T
       name: (ingredient_name))))
 
 ==================
+Basis-reference percentage without a leading zero
+==================
+title: T
+---
+[.5%flour]<vanilla>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (ingredient
+      amount: (amount_block
+        (basis_ref))
+      name: (ingredient_name))))
+
+==================
 Ingredient with no amount (to taste)
 ==================
 title: T
