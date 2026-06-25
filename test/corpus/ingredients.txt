@@ -1,0 +1,147 @@
+==================
+Basis declaration
+==================
+title: T
+---
+[500g]<~flour>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (basis_decl
+      amount: (amount_block
+        (plain_amount))
+      name: (basis_name))))
+
+==================
+Basis-member amount (percent-star)
+==================
+title: T
+---
+[80%*flour]<bread flour>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (ingredient
+      amount: (amount_block
+        (basis_member))
+      name: (ingredient_name))))
+
+==================
+Basis-reference amount (percent)
+==================
+title: T
+---
+[75%flour]<water>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (ingredient
+      amount: (amount_block
+        (basis_ref))
+      name: (ingredient_name))))
+
+==================
+Ingredient with no amount (to taste)
+==================
+title: T
+---
+<salt>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (ingredient
+      name: (ingredient_name))))
+
+==================
+Sub-recipe reference with explicit mapping
+==================
+title: T
+---
+[20%*flour]<+poolish>(whole wheat flour->bread flour)
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (sub_recipe
+      amount: (basis_member)
+      name: (recipe_name)
+      mappings: (mapping_group
+        (mapping_list
+          (mapping
+            inner: (mapping_side)
+            outer: (mapping_side)))))))
+
+==================
+Plain-amount sub-recipe (no macro)
+==================
+title: T
+---
+[2]<+poolish>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (sub_recipe
+      amount: (plain_amount)
+      name: (recipe_name))))
+
+==================
+Group label heading
+==================
+title: T
+---
+For the dough:
+[500g]<~flour>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (group_label
+      text: (label_text))
+    (basis_decl
+      amount: (amount_block
+        (plain_amount))
+      name: (basis_name))))
+
+==================
+Grammar rejects a macro on a plain-amount sub-recipe
+:error
+==================
+title: T
+---
+[2]<+poolish>(a->b)
+------------------------------------------------------------------------
+
+==================
+Grammar rejects non-mapping text in a macro
+:error
+==================
+title: T
+---
+[20%*flour]<+poolish>(garbage)
+------------------------------------------------------------------------

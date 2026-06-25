@@ -1,0 +1,13 @@
+{
+  "name": "tree-sitter-neep",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for the Neep recipe format",
+  "main": "bindings/node",
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.24.0"
+  }
+}

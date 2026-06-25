@@ -1,0 +1,933 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
+  "name": "neep",
+  "rules": {
+    "file": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_doc_start_meta"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_metadata_document"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_doc_start_steps"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "step_section"
+            }
+          ]
+        }
+      ]
+    },
+    "_metadata_document": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "metadata_section"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_separator"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "ingredient_section"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SEQ",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_separator"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "step_section"
+                        },
+                        {
+                          "type": "CHOICE",
+                          "members": [
+                            {
+                              "type": "SEQ",
+                              "members": [
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "_separator"
+                                },
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "note_section"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "BLANK"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "_separator": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 5,
+        "content": {
+          "type": "PATTERN",
+          "value": "---(\\r\\n|\\r|\\n)"
+        }
+      }
+    },
+    "comment": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 10,
+        "content": {
+          "type": "PATTERN",
+          "value": "\\/\\/[^\\r\\n]*"
+        }
+      }
+    },
+    "_nl": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "\\r\\n|\\r|\\n"
+      }
+    },
+    "_eol": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_nl"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eof"
+        }
+      ]
+    },
+    "metadata_section": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "equipment_line"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "kv_line"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "blank_line"
+          }
+        ]
+      }
+    },
+    "equipment_line": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "!"
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "equipment_text"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "equipment_text": {
+      "type": "PATTERN",
+      "value": "[^\\r\\n]+"
+    },
+    "kv_line": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "key",
+          "content": {
+            "type": "SYMBOL",
+            "name": "key"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "value",
+              "content": {
+                "type": "SYMBOL",
+                "name": "value"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "key": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^\\s:()\\[\\]<>{}~*+!@%\\/]+"
+      }
+    },
+    "value": {
+      "type": "PATTERN",
+      "value": "[^\\r\\n]+"
+    },
+    "blank_line": {
+      "type": "SYMBOL",
+      "name": "_nl"
+    },
+    "ingredient_section": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "basis_decl"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "sub_recipe"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ingredient"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "group_label"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "blank_line"
+          }
+        ]
+      }
+    },
+    "basis_decl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "amount",
+          "content": {
+            "type": "SYMBOL",
+            "name": "amount_block"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "<~"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "basis_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "sub_recipe": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "["
+                },
+                {
+                  "type": "FIELD",
+                  "name": "amount",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_basis_amount"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": "]"
+                },
+                {
+                  "type": "STRING",
+                  "value": "<+"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "name",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "recipe_name"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "FIELD",
+                      "name": "mappings",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "mapping_group"
+                      }
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "["
+                },
+                {
+                  "type": "FIELD",
+                  "name": "amount",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "plain_amount"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": "]"
+                },
+                {
+                  "type": "STRING",
+                  "value": "<+"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "name",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "recipe_name"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": ">"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "ingredient": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "amount",
+              "content": {
+                "type": "SYMBOL",
+                "name": "amount_block"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "group_label": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "text",
+          "content": {
+            "type": "SYMBOL",
+            "name": "label_text"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "label_text": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^ \\t\\r\\n\\[!<][^\\r\\n]*"
+      }
+    },
+    "amount_block": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "["
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_amount"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "]"
+        }
+      ]
+    },
+    "_amount": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "basis_member"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "basis_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "plain_amount"
+        }
+      ]
+    },
+    "_basis_amount": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "basis_member"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "basis_ref"
+        }
+      ]
+    },
+    "basis_member": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 2,
+        "content": {
+          "type": "PATTERN",
+          "value": "[0-9]+(\\.[0-9]*)?%\\*[^\\s()\\[\\]<>{}~*+!@%\\/]+"
+        }
+      }
+    },
+    "basis_ref": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 1,
+        "content": {
+          "type": "PATTERN",
+          "value": "[0-9]+(\\.[0-9]*)?%[^\\s()\\[\\]<>{}~*+!@%\\/]+"
+        }
+      }
+    },
+    "plain_amount": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^\\]\\r\\n]+"
+      }
+    },
+    "basis_name": {
+      "type": "SYMBOL",
+      "name": "_word"
+    },
+    "recipe_name": {
+      "type": "SYMBOL",
+      "name": "_word"
+    },
+    "ingredient_name": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^>\\r\\n+][^>\\r\\n]*"
+      }
+    },
+    "mapping_group": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "("
+        },
+        {
+          "type": "SYMBOL",
+          "name": "mapping_list"
+        },
+        {
+          "type": "STRING",
+          "value": ")"
+        }
+      ]
+    },
+    "mapping_list": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "mapping"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": ","
+              },
+              {
+                "type": "SYMBOL",
+                "name": "mapping"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "mapping": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "inner",
+          "content": {
+            "type": "SYMBOL",
+            "name": "mapping_side"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "->"
+        },
+        {
+          "type": "FIELD",
+          "name": "outer",
+          "content": {
+            "type": "SYMBOL",
+            "name": "mapping_side"
+          }
+        }
+      ]
+    },
+    "mapping_side": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^,()>\\r\\n\\-]+"
+      }
+    },
+    "step_section": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "section_header"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "prose_line"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "blank_line"
+          }
+        ]
+      }
+    },
+    "section_header": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_header_marker"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "title",
+              "content": {
+                "type": "SYMBOL",
+                "name": "header_text"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "_header_marker": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PREC",
+        "value": 2,
+        "content": {
+          "type": "PATTERN",
+          "value": "=[ \\t]+"
+        }
+      }
+    },
+    "header_text": {
+      "type": "PATTERN",
+      "value": "[^\\r\\n]+"
+    },
+    "prose_line": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "REPEAT1",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_prose_token"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
+    "_prose_token": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "ingredient_with_amount"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "sub_recipe_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "ingredient_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timer"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "target"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "literal"
+        }
+      ]
+    },
+    "ingredient_with_amount": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "amount",
+          "content": {
+            "type": "SYMBOL",
+            "name": "amount_block"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "sub_recipe_ref": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<+"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "recipe_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "ingredient_ref": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "timer": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "@[^ \\t\\r\\n.,;!?]+"
+      }
+    },
+    "target": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "\\{[^}\\r\\n]*\\}"
+      }
+    },
+    "literal": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "([^\\[<@{\\/\\r\\n]|\\/[^\\/\\r\\n])+"
+      }
+    },
+    "note_section": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "SYMBOL",
+        "name": "note_line"
+      }
+    },
+    "note_line": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "text",
+              "content": {
+                "type": "SYMBOL",
+                "name": "note_text"
+              }
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_eol"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "blank_line"
+        }
+      ]
+    },
+    "note_text": {
+      "type": "PATTERN",
+      "value": "[^\\r\\n]+"
+    },
+    "_word": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^\\s()\\[\\]<>{}~*+!@%\\/]+"
+      }
+    }
+  },
+  "extras": [
+    {
+      "type": "PATTERN",
+      "value": "[ \\t]+"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "comment"
+    }
+  ],
+  "conflicts": [
+    [
+      "_amount",
+      "_basis_amount"
+    ],
+    [
+      "_amount",
+      "sub_recipe"
+    ]
+  ],
+  "precedences": [],
+  "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "_doc_start_meta"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_doc_start_steps"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_eof"
+    }
+  ],
+  "inline": [],
+  "supertypes": []
+}

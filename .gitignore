@@ -1,0 +1,9 @@
+node_modules/
+*.log
+
+# Build artifacts (the generated parser in src/ IS checked in)
+build/
+*.o
+*.so
+*.dylib
+*.wasm

@@ -1,0 +1,268 @@
+/**
+ * @file Tree-sitter grammar for the Neep recipe format (.neep)
+ * @license MIT
+ *
+ * Neep is a line-oriented, section-delimited plain-text recipe format.
+ * The document is a sequence of up to four sections separated by `---`
+ * lines, in fixed order: metadata, ingredients, steps, notes. A file may
+ * also be steps-only (no separators).
+ *
+ * Design notes:
+ *  - Whitespace (space/tab) and `//` comments are `extras`: they may appear
+ *    between any two tokens and are dropped by consumers. Newlines are NOT
+ *    extras; they are explicit `_nl` tokens because the format is
+ *    line-oriented.
+ *  - Amount blocks (`[...]`) are captured as an opaque `amount_text` string.
+ *    The basis-amount vs plain-amount distinction is made in neep-syntax,
+ *    per spec ("Detected during validation, not parsing").
+ *  - The metadata-only vs steps-only ambiguity (both lack `---`) is resolved
+ *    with dynamic precedence favouring the metadata-led document.
+ */
+
+module.exports = grammar({
+  name: 'neep',
+
+  extras: $ => [
+    /[ \t]+/,
+    $.comment,
+  ],
+
+  externals: $ => [
+    $._doc_start_meta,
+    $._doc_start_steps,
+    $._eof,
+  ],
+
+  // `[amount]` is a shared prefix of ingredient/basis-decl/sub-recipe lines;
+  // the amount's role (generic vs. sub-recipe basis) is only settled by the
+  // sigil after `]`, so GLR must keep both interpretations alive.
+  conflicts: $ => [
+    [$._amount, $._basis_amount],
+    [$._amount, $.sub_recipe],
+  ],
+
+  rules: {
+    // ── Top level ────────────────────────────────────────────────────
+    // The external scanner emits exactly one zero-width marker at the start
+    // of the file, selecting the metadata-led vs steps-only interpretation.
+    file: $ => choice(
+      seq($._doc_start_meta, $._metadata_document),
+      seq($._doc_start_steps, $.step_section),
+    ),
+
+    _metadata_document: $ => seq(
+      $.metadata_section,
+      optional(seq(
+        $._separator,
+        $.ingredient_section,
+        optional(seq(
+          $._separator,
+          $.step_section,
+          optional(seq(
+            $._separator,
+            $.note_section,
+          )),
+        )),
+      )),
+    ),
+
+    _separator: $ => token(prec(5, /---(\r\n|\r|\n)/)),
+
+    comment: $ => token(prec(10, /\/\/[^\r\n]*/)),
+
+    _nl: $ => token(/\r\n|\r|\n/),
+
+    // Line terminator: a newline, or end-of-file (so the last line of a file
+    // need not have a trailing newline).
+    _eol: $ => choice($._nl, $._eof),
+
+    // ── Metadata ─────────────────────────────────────────────────────
+    metadata_section: $ => repeat1(choice(
+      $.equipment_line,
+      $.kv_line,
+      $.blank_line,
+    )),
+
+    equipment_line: $ => seq(
+      '!',
+      field('value', $.equipment_text),
+      $._eol,
+    ),
+    equipment_text: $ => /[^\r\n]+/,
+
+    kv_line: $ => seq(
+      field('key', $.key),
+      ':',
+      optional(field('value', $.value)),
+      $._eol,
+    ),
+    key: $ => token(/[^\s:()\[\]<>{}~*+!@%\/]+/),
+    value: $ => /[^\r\n]+/,
+
+    blank_line: $ => $._nl,
+
+    // ── Ingredients ──────────────────────────────────────────────────
+    ingredient_section: $ => repeat1(choice(
+      $.basis_decl,
+      $.sub_recipe,
+      $.ingredient,
+      $.group_label,
+      $.blank_line,
+    )),
+
+    // [500g]<~flour>
+    basis_decl: $ => seq(
+      field('amount', $.amount_block),
+      '<~',
+      field('name', $.basis_name),
+      '>',
+      $._eol,
+    ),
+
+    // [20%*flour]<+poolish>(whole wheat flour->bread flour)
+    //
+    // A macro `(...)` is only legal on a basis-relative reference; a
+    // plain-amount reference admits no macro. Splitting the production here
+    // is what lets the grammar — not the semantic layer — reject
+    // `[2]<+poolish>(a->b)`.
+    sub_recipe: $ => seq(
+      choice(
+        seq(
+          '[',
+          field('amount', $._basis_amount),
+          ']',
+          '<+',
+          field('name', $.recipe_name),
+          '>',
+          optional(field('mappings', $.mapping_group)),
+        ),
+        seq(
+          '[',
+          field('amount', $.plain_amount),
+          ']',
+          '<+',
+          field('name', $.recipe_name),
+          '>',
+        ),
+      ),
+      $._eol,
+    ),
+
+    // [80%*flour]<bread flour>   |   <salt>
+    ingredient: $ => seq(
+      optional(field('amount', $.amount_block)),
+      '<',
+      field('name', $.ingredient_name),
+      '>',
+      $._eol,
+    ),
+
+    group_label: $ => seq(
+      field('text', $.label_text),
+      $._eol,
+    ),
+    label_text: $ => token(/[^ \t\r\n\[!<][^\r\n]*/),
+
+    // The amount inside `[...]` is classified by the grammar, not re-parsed
+    // downstream:
+    //   `80%*flour` → basis_member   (a constituent share of a basis)
+    //   `75%flour`  → basis_ref       (a percentage of a basis total)
+    //   `500g`, `2` → plain_amount    (a literal amount)
+    amount_block: $ => seq('[', optional($._amount), ']'),
+    _amount: $ => choice($.basis_member, $.basis_ref, $.plain_amount),
+    _basis_amount: $ => choice($.basis_member, $.basis_ref),
+
+    basis_member: $ =>
+      token(prec(2, /[0-9]+(\.[0-9]*)?%\*[^\s()\[\]<>{}~*+!@%\/]+/)),
+    basis_ref: $ =>
+      token(prec(1, /[0-9]+(\.[0-9]*)?%[^\s()\[\]<>{}~*+!@%\/]+/)),
+    plain_amount: $ => token(/[^\]\r\n]+/),
+
+    basis_name: $ => $._word,
+    recipe_name: $ => $._word,
+    // The leading character may not be `+`, so that `<+name>` is unambiguously
+    // a sub-recipe reference rather than an ingredient named "+name".
+    ingredient_name: $ => token(/[^>\r\n+][^>\r\n]*/),
+
+    mapping_group: $ => seq('(', $.mapping_list, ')'),
+    mapping_list: $ => seq($.mapping, repeat(seq(',', $.mapping))),
+    mapping: $ => seq(
+      field('inner', $.mapping_side),
+      '->',
+      field('outer', $.mapping_side),
+    ),
+    mapping_side: $ => token(/[^,()>\r\n\-]+/),
+
+    // ── Steps ────────────────────────────────────────────────────────
+    step_section: $ => repeat1(choice(
+      $.section_header,
+      $.prose_line,
+      $.blank_line,
+    )),
+
+    section_header: $ => seq(
+      $._header_marker,
+      optional(field('title', $.header_text)),
+      $._eol,
+    ),
+    _header_marker: $ => token(prec(2, /=[ \t]+/)),
+    header_text: $ => /[^\r\n]+/,
+
+    prose_line: $ => seq(
+      repeat1($._prose_token),
+      $._eol,
+    ),
+
+    _prose_token: $ => choice(
+      $.ingredient_with_amount,
+      $.sub_recipe_ref,
+      $.ingredient_ref,
+      $.timer,
+      $.target,
+      $.literal,
+    ),
+
+    // [75%flour]<water>
+    ingredient_with_amount: $ => seq(
+      field('amount', $.amount_block),
+      '<',
+      field('name', $.ingredient_name),
+      '>',
+    ),
+
+    // <+poolish>
+    sub_recipe_ref: $ => seq(
+      '<+',
+      field('name', $.recipe_name),
+      '>',
+    ),
+
+    // <whole wheat flour>
+    ingredient_ref: $ => seq(
+      '<',
+      field('name', $.ingredient_name),
+      '>',
+    ),
+
+    // @30m  @2-3h
+    timer: $ => token(/@[^ \t\r\n.,;!?]+/),
+
+    // {500°F}
+    target: $ => token(/\{[^}\r\n]*\}/),
+
+    literal: $ => token(/([^\[<@{\/\r\n]|\/[^\/\r\n])+/),
+
+    // ── Notes ────────────────────────────────────────────────────────
+    // Freeform, no inline tokens scanned. Captured line-by-line; consumers
+    // rejoin with newlines.
+    note_section: $ => repeat1($.note_line),
+    note_line: $ => choice(
+      seq(field('text', $.note_text), $._eol),
+      $.blank_line,
+    ),
+    note_text: $ => /[^\r\n]+/,
+
+    // ── Shared ───────────────────────────────────────────────────────
+    _word: $ => token(/[^\s()\[\]<>{}~*+!@%\/]+/),
+  },
+});

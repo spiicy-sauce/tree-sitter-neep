@@ -1,0 +1,80 @@
+==================
+Steps-only file (no separators)
+==================
+Combine everything and bake.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal))))
+
+==================
+Metadata-only file
+==================
+title: T
+tags: a, b
+!dutch oven
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value))
+    (kv_line
+      key: (key)
+      value: (value))
+    (equipment_line
+      value: (equipment_text))))
+
+==================
+Full four-section document
+==================
+title: T
+yield: 1 loaf
+!dutch oven
+---
+[500g]<~flour>
+
+[80%*flour]<bread flour>
+---
+= Mix
+
+Combine <bread flour>.
+---
+Rest overnight.
+Watch closely.
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value))
+    (kv_line
+      key: (key)
+      value: (value))
+    (equipment_line
+      value: (equipment_text)))
+  (ingredient_section
+    (basis_decl
+      amount: (amount_block
+        (plain_amount))
+      name: (basis_name))
+    (blank_line)
+    (ingredient
+      amount: (amount_block
+        (basis_member))
+      name: (ingredient_name)))
+  (step_section
+    (section_header
+      title: (header_text))
+    (blank_line)
+    (prose_line
+      (literal)
+      (ingredient_ref
+        name: (ingredient_name))
+      (literal)))
+  (note_section
+    (note_line
+      text: (note_text))
+    (note_line
+      text: (note_text))))

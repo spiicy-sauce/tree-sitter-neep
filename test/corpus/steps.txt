@@ -1,0 +1,61 @@
+==================
+Prose with all reference tokens
+==================
+Add [75%flour]<water> and <salt>, then <+poolish>.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (ingredient_with_amount
+        amount: (amount_block
+          (basis_ref))
+        name: (ingredient_name))
+      (literal)
+      (ingredient_ref
+        name: (ingredient_name))
+      (literal)
+      (sub_recipe_ref
+        name: (recipe_name))
+      (literal))))
+
+==================
+Timers (simple and range)
+==================
+Rest @30m then @2-3h.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (timer)
+      (literal)
+      (timer)
+      (literal))))
+
+==================
+Target temperature
+==================
+Preheat to {500°F}.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (target)
+      (literal))))
+
+==================
+Section header
+==================
+= Preferment
+
+Make the poolish.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (section_header
+      title: (header_text))
+    (blank_line)
+    (prose_line
+      (literal))))

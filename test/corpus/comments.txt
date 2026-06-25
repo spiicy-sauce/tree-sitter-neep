@@ -1,0 +1,13 @@
+==================
+Full-line and inline comments
+==================
+// a full comment
+Add salt. // trailing
+------------------------------------------------------------------------
+(file
+  (comment)
+  (step_section
+    (blank_line)
+    (prose_line
+      (literal)
+      (comment))))
