@@ -172,22 +172,33 @@ module.exports = grammar({
     //   `pinch`, `2` → plain_amount   (a literal amount)
     //
     // Canonically a plain amount is `<number> <unit>` (single space) or a
-    // bare unit (`pinch`); a number glued to its unit (`3cloves`) is accepted
-    // but warned about by the semantic layer and fixed by the formatter.
+    // bare unit (`pinch`), and a basis amount is `<number>% <basis>` /
+    // `<number>% *<basis>` (single space, `%` glued to the number). The glued
+    // forms (`3cloves`, `100%flour`, `10%*flour`) are accepted but warned about
+    // by the semantic layer and fixed by the formatter.
     amount_block: $ => seq('[', optional($._amount), ']'),
     _amount: $ => choice($.basis_member, $.basis_ref, $.plain_amount),
     _basis_amount: $ => choice($.basis_member, $.basis_ref),
 
     // The percentage admits a missing integer part (`.5%`) or fractional part
     // (`5.%`), as well as the usual `5%` / `5.5%`.
+    //
+    // Like a plain amount, the canonical form puts a single space between the
+    // number and the "unit" — here the basis name — but the `%` stays glued to
+    // the number: `100% flour`, `10% *flour`. The space is optional in the
+    // grammar (`100%flour`, `10%*flour` still parse) so the semantic layer can
+    // warn and the formatter can fix it.
     basis_member: $ =>
-      token(prec(2, /([0-9]+(\.[0-9]*)?|\.[0-9]+)%\*[^\s()\[\]<>{}~*+!@%\/]+/)),
+      token(prec(2, /([0-9]+(\.[0-9]*)?|\.[0-9]+)%[ \t]*\*[^\s()\[\]<>{}~*+!@%\/]+/)),
     basis_ref: $ =>
-      token(prec(1, /([0-9]+(\.[0-9]*)?|\.[0-9]+)%[^\s()\[\]<>{}~*+!@%\/]+/)),
+      token(prec(1, /([0-9]+(\.[0-9]*)?|\.[0-9]+)%[ \t]*[^\s()\[\]<>{}~*+!@%\/]+/)),
     plain_amount: $ => token(/[^\]\r\n]+/),
 
     basis_name: $ => $._word,
-    recipe_name: $ => $._word,
+    // Like `_word`, but `/` and `.` are allowed so a sub-recipe can be referred
+    // to by a relative path (`<+breads/poolish>`, `<+../shared/starter>`); the
+    // loader resolves it against the referring file's directory.
+    recipe_name: $ => token(/[^\s()\[\]<>{}~*+!@%]+/),
     // The leading character may not be `+` or `!`, so that `<+name>` and
     // `<!name>` are unambiguously sub-recipe and equipment references.
     ingredient_name: $ => token(/[^>\r\n+!][^>\r\n]*/),

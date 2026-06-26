@@ -53,6 +53,29 @@ title: T
       name: (ingredient_name))))
 
 ==================
+Basis amounts with the canonical space
+==================
+title: T
+---
+[10% *flour]<bread flour>
+[100% flour]<water>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (ingredient
+      amount: (amount_block
+        (basis_member))
+      name: (ingredient_name))
+    (ingredient
+      amount: (amount_block
+        (basis_ref))
+      name: (ingredient_name))))
+
+==================
 Basis-reference percentage without a leading zero
 ==================
 title: T
@@ -121,6 +144,27 @@ title: T
       key: (key)
       value: (value)))
   (ingredient_section
+    (sub_recipe
+      amount: (plain_amount)
+      name: (recipe_name))))
+
+==================
+Sub-recipe referred to by a relative path
+==================
+title: T
+---
+[20%*flour]<+breads/poolish>
+[1]<+../shared/starter>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (sub_recipe
+      amount: (basis_member)
+      name: (recipe_name))
     (sub_recipe
       amount: (plain_amount)
       name: (recipe_name))))

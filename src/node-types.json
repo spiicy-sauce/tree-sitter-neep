@@ -429,11 +429,6 @@
     }
   },
   {
-    "type": "recipe_name",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "section_header",
     "named": true,
     "fields": {
@@ -619,6 +614,10 @@
   },
   {
     "type": "plain_amount",
+    "named": true
+  },
+  {
+    "type": "recipe_name",
     "named": true
   },
   {
