@@ -207,3 +207,24 @@ title: T
 ---
 [20%*flour]<+poolish>(garbage)
 ------------------------------------------------------------------------
+
+==================
+Ingredient group declaration
+==================
+title: T
+---
+<$dry ingredients>
+[50% *flour]<white flour>
+------------------------------------------------------------------------
+(file
+  (metadata_section
+    (kv_line
+      key: (key)
+      value: (value)))
+  (ingredient_section
+    (group_decl
+      name: (ingredient_name))
+    (ingredient
+      amount: (amount_block
+        (basis_member))
+      name: (ingredient_name))))

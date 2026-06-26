@@ -107,6 +107,7 @@ module.exports = grammar({
       $.basis_decl,
       $.sub_recipe,
       $.ingredient,
+      $.group_decl,
       $.group_label,
       $.blank_line,
     )),
@@ -158,6 +159,16 @@ module.exports = grammar({
       $._eol,
     ),
 
+    // <$dry ingredients> — names a group of the ingredient lines that follow it
+    // up to the next blank line (the membership boundary is line-positional, so
+    // the semantic layer assembles it).
+    group_decl: $ => seq(
+      '<$',
+      field('name', $.ingredient_name),
+      '>',
+      $._eol,
+    ),
+
     group_label: $ => seq(
       field('text', $.label_text),
       $._eol,
@@ -199,9 +210,10 @@ module.exports = grammar({
     // to by a relative path (`<+breads/poolish>`, `<+../shared/starter>`); the
     // loader resolves it against the referring file's directory.
     recipe_name: $ => token(/[^\s()\[\]<>{}~*+!@%]+/),
-    // The leading character may not be `+` or `!`, so that `<+name>` and
-    // `<!name>` are unambiguously sub-recipe and equipment references.
-    ingredient_name: $ => token(/[^>\r\n+!][^>\r\n]*/),
+    // The leading character may not be a reference sigil (`+ ! $ #`), so that
+    // `<+name>`, `<!name>`, `<$name>`, and `<#name>` are unambiguously
+    // sub-recipe, equipment, group, and anchor references.
+    ingredient_name: $ => token(/[^>\r\n+!$#][^>\r\n]*/),
 
     mapping_group: $ => seq('(', $.mapping_list, ')'),
     mapping_list: $ => seq($.mapping, repeat(seq(',', $.mapping))),
@@ -219,13 +231,18 @@ module.exports = grammar({
       $.blank_line,
     )),
 
+    // = Autolyse <#autolyse>
+    // A header may end with a `<#anchor>` so later steps can link back to it.
+    // The title stops at `<` so the anchor parses separately.
     section_header: $ => seq(
       $._header_marker,
       optional(field('title', $.header_text)),
+      optional(field('anchor', $.header_anchor)),
       $._eol,
     ),
     _header_marker: $ => token(prec(2, /=[ \t]+/)),
-    header_text: $ => /[^\r\n]+/,
+    header_text: $ => token(/[^<\r\n]+/),
+    header_anchor: $ => seq('<#', field('name', $.ingredient_name), '>'),
 
     prose_line: $ => seq(
       repeat1($._prose_token),
@@ -236,6 +253,8 @@ module.exports = grammar({
       $.ingredient_with_amount,
       $.sub_recipe_ref,
       $.equipment_ref,
+      $.group_ref,
+      $.hash_link,
       $.ingredient_ref,
       $.timer,
       $.target,
@@ -260,6 +279,20 @@ module.exports = grammar({
     // <!dutch oven>
     equipment_ref: $ => seq(
       '<!',
+      field('name', $.ingredient_name),
+      '>',
+    ),
+
+    // <$dry ingredients> — references every ingredient in the named group.
+    group_ref: $ => seq(
+      '<$',
+      field('name', $.ingredient_name),
+      '>',
+    ),
+
+    // <#autolyse> — links back to the header that declared the anchor.
+    hash_link: $ => seq(
+      '<#',
       field('name', $.ingredient_name),
       '>',
     ),

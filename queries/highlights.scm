@@ -24,6 +24,13 @@
 (recipe_name) @function
 (ingredient_name) @variable
 
+; Groups and header anchors read like sub-recipes (a later, more specific
+; pattern overrides the generic `ingredient_name` above).
+(group_decl name: (ingredient_name) @function)
+(group_ref name: (ingredient_name) @function)
+(hash_link name: (ingredient_name) @function)
+(header_anchor name: (ingredient_name) @function)
+
 ; ── Inline step tokens ───────────────────────────────────────────────
 (timer) @constant.builtin
 (target) @constant
@@ -43,5 +50,7 @@
 "<~" @punctuation.special
 "<+" @punctuation.special
 "<!" @punctuation.special
+"<$" @punctuation.special
+"<#" @punctuation.special
 ":" @punctuation.delimiter
 "," @punctuation.delimiter

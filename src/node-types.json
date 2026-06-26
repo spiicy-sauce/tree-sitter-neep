@@ -119,6 +119,22 @@
     }
   },
   {
+    "type": "group_decl",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "group_label",
     "named": true,
     "fields": {
@@ -135,9 +151,52 @@
     }
   },
   {
-    "type": "header_text",
+    "type": "group_ref",
     "named": true,
-    "fields": {}
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "hash_link",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "header_anchor",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "ingredient",
@@ -195,6 +254,10 @@
         },
         {
           "type": "blank_line",
+          "named": true
+        },
+        {
+          "type": "group_decl",
           "named": true
         },
         {
@@ -402,6 +465,14 @@
           "named": true
         },
         {
+          "type": "group_ref",
+          "named": true
+        },
+        {
+          "type": "hash_link",
+          "named": true
+        },
+        {
           "type": "ingredient_ref",
           "named": true
         },
@@ -432,6 +503,16 @@
     "type": "section_header",
     "named": true,
     "fields": {
+      "anchor": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "header_anchor",
+            "named": true
+          }
+        ]
+      },
       "title": {
         "multiple": false,
         "required": false,
@@ -561,6 +642,14 @@
     "named": false
   },
   {
+    "type": "<#",
+    "named": false
+  },
+  {
+    "type": "<$",
+    "named": false
+  },
+  {
     "type": "<+",
     "named": false
   },
@@ -590,6 +679,10 @@
   },
   {
     "type": "comment",
+    "named": true
+  },
+  {
+    "type": "header_text",
     "named": true
   },
   {

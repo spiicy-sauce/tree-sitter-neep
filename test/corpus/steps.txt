@@ -74,3 +74,31 @@ Make the poolish.
     (blank_line)
     (prose_line
       (literal))))
+
+==================
+Group reference and hash link in prose
+==================
+Mix <$dry ingredients> into the <#autolyse>.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (group_ref
+        name: (ingredient_name))
+      (literal)
+      (hash_link
+        name: (ingredient_name))
+      (literal))))
+
+==================
+Section header with an anchor
+==================
+= Autolyse <#autolyse>
+------------------------------------------------------------------------
+(file
+  (step_section
+    (section_header
+      title: (header_text)
+      anchor: (header_anchor
+        name: (ingredient_name)))))

@@ -263,6 +263,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "group_decl"
+          },
+          {
+            "type": "SYMBOL",
             "name": "group_label"
           },
           {
@@ -450,6 +454,31 @@
         }
       ]
     },
+    "group_decl": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<$"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_eol"
+        }
+      ]
+    },
     "group_label": {
       "type": "SEQ",
       "members": [
@@ -573,7 +602,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^>\\r\\n+!][^>\\r\\n]*"
+        "value": "[^>\\r\\n+!$#][^>\\r\\n]*"
       }
     },
     "mapping_group": {
@@ -694,6 +723,22 @@
           ]
         },
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "anchor",
+              "content": {
+                "type": "SYMBOL",
+                "name": "header_anchor"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "SYMBOL",
           "name": "_eol"
         }
@@ -711,8 +756,32 @@
       }
     },
     "header_text": {
-      "type": "PATTERN",
-      "value": "[^\\r\\n]+"
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^<\\r\\n]+"
+      }
+    },
+    "header_anchor": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<#"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
     },
     "prose_line": {
       "type": "SEQ",
@@ -744,6 +813,14 @@
         {
           "type": "SYMBOL",
           "name": "equipment_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "group_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "hash_link"
         },
         {
           "type": "SYMBOL",
@@ -819,6 +896,48 @@
         {
           "type": "STRING",
           "value": "<!"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "group_ref": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<$"
+        },
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ingredient_name"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ">"
+        }
+      ]
+    },
+    "hash_link": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<#"
         },
         {
           "type": "FIELD",
