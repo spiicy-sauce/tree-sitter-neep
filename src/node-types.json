@@ -313,12 +313,22 @@
           }
         ]
       },
-      "out_macro": {
+      "out_amount": {
         "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "macro_block",
+            "type": "amount_block",
+            "named": true
+          }
+        ]
+      },
+      "sub_input": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "recipe_name",
             "named": true
           }
         ]
@@ -354,21 +364,6 @@
           }
         ]
       }
-    }
-  },
-  {
-    "type": "macro_block",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
-        {
-          "type": "amount_macro",
-          "named": true
-        }
-      ]
     }
   },
   {

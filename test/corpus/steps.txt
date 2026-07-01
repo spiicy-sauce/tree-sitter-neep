@@ -135,8 +135,25 @@ Chop [1 tbsp]<parsley:chopped parsley>[=]
           (plain_amount))
         input: (intermediate_name)
         name: (intermediate_name)
-        out_macro: (macro_block
+        out_amount: (amount_block
           (amount_macro))))))
+
+==================
+Intermediate declaration (input/output form) with a trailing absolute amount
+==================
+Chop [1 tbsp]<parsley:chopped parsley>[2 tbsp]
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (intermediate_decl
+        in_amount: (amount_block
+          (plain_amount))
+        input: (intermediate_name)
+        name: (intermediate_name)
+        out_amount: (amount_block
+          (plain_amount))))))
 
 ==================
 Intermediate declaration with a prefixed amount macro
@@ -151,4 +168,20 @@ Whisk [=]<:dressing> and coat.
         in_amount: (amount_block
           (amount_macro))
         name: (intermediate_name))
+      (literal))))
+
+==================
+Intermediate declaration with a sub-recipe input
+==================
+add <+leavan:dough>[+] to it.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (intermediate_decl
+        sub_input: (recipe_name)
+        name: (intermediate_name)
+        out_amount: (amount_block
+          (amount_macro)))
       (literal))))

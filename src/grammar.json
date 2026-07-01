@@ -588,7 +588,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^\\s()\\[\\]<>{}~*+!@%]+"
+        "value": "[^\\s()\\[\\]<>{}~*+!@%:]+"
       }
     },
     "ingredient_name": {
@@ -969,50 +969,93 @@
             ]
           },
           {
-            "type": "STRING",
-            "value": "<"
-          },
-          {
             "type": "CHOICE",
             "members": [
               {
-                "type": "FIELD",
-                "name": "input",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "intermediate_name"
-                }
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "<"
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "FIELD",
+                        "name": "input",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "intermediate_name"
+                        }
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ":"
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "name",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "intermediate_name"
+                    }
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ">"
+                  }
+                ]
               },
               {
-                "type": "BLANK"
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "STRING",
+                    "value": "<+"
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "sub_input",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "recipe_name"
+                    }
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ":"
+                  },
+                  {
+                    "type": "FIELD",
+                    "name": "name",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "intermediate_name"
+                    }
+                  },
+                  {
+                    "type": "STRING",
+                    "value": ">"
+                  }
+                ]
               }
             ]
           },
           {
-            "type": "STRING",
-            "value": ":"
-          },
-          {
-            "type": "FIELD",
-            "name": "name",
-            "content": {
-              "type": "SYMBOL",
-              "name": "intermediate_name"
-            }
-          },
-          {
-            "type": "STRING",
-            "value": ">"
-          },
-          {
             "type": "CHOICE",
             "members": [
               {
                 "type": "FIELD",
-                "name": "out_macro",
+                "name": "out_amount",
                 "content": {
                   "type": "SYMBOL",
-                  "name": "macro_block"
+                  "name": "amount_block"
                 }
               },
               {
@@ -1022,23 +1065,6 @@
           }
         ]
       }
-    },
-    "macro_block": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "["
-        },
-        {
-          "type": "SYMBOL",
-          "name": "amount_macro"
-        },
-        {
-          "type": "STRING",
-          "value": "]"
-        }
-      ]
     },
     "intermediate_name": {
       "type": "TOKEN",

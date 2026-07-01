@@ -202,8 +202,10 @@ module.exports = grammar({
     basis_name: $ => $._word,
     // Like `_word`, but `/` and `.` are allowed so a sub-recipe can be referred
     // to by a relative path (`<+breads/poolish>`, `<+../shared/starter>`); the
-    // loader resolves it against the referring file's directory.
-    recipe_name: $ => token(/[^\s()\[\]<>{}~*+!@%]+/),
+    // loader resolves it against the referring file's directory. A `:` may not
+    // appear, so `<+leavan:dough>` splits into a sub-recipe input and an
+    // intermediate name rather than one path.
+    recipe_name: $ => token(/[^\s()\[\]<>{}~*+!@%:]+/),
     // The leading character may not be a reference sigil (`+ ! : #`), so that
     // `<+name>`, `<!name>`, and `<#name>` are unambiguously sub-recipe,
     // equipment, and anchor references. A `:` may not appear at all: inside
@@ -294,32 +296,45 @@ module.exports = grammar({
     ),
 
     // An intermediate DECLARATION — a product made mid-recipe, marked by the
-    // `:` inside `<…>`. Two shapes:
+    // `:` inside `<…>`. Shapes:
     //   [1 tbsp]<:lemon juice>            output form: the prefix amount is the
     //                                     intermediate's own amount.
     //   [1 tbsp]<parsley:chopped parsley>[=]
     //                                     input/output form: `parsley` (before
     //                                     the colon) is a named input consumed
     //                                     inline, the prefix amount is the
-    //                                     input's amount, and the trailing
-    //                                     `[=]`/`[+]` macro is the intermediate's
-    //                                     amount (passthrough / sum of inputs).
-    // Both the prefix amount and the trailing macro are optional. A LATER use of
-    // the intermediate is a bare `<name>` — the same token as an ingredient
-    // reference (`ingredient_ref`); the semantic layer tells them apart by name.
+    //                                     input's amount, and the trailing amount
+    //                                     is the intermediate's own — either an
+    //                                     absolute amount (`[2 tbsp]`) or a macro
+    //                                     (`[=]` passthrough / `[+]` sum of inputs).
+    //   <+leavan:dough>[+]                sub-recipe input: a `<+name>` sub-recipe
+    //                                     is added to the intermediate.
+    // Both the prefix and the trailing amount are optional. A LATER use of the
+    // intermediate is a bare `<name>` — the same token as an ingredient reference
+    // (`ingredient_ref`); the semantic layer tells them apart by name.
     intermediate_decl: $ => prec.right(seq(
       optional(field('in_amount', $.amount_block)),
-      '<',
-      optional(field('input', $.intermediate_name)),
-      ':',
-      field('name', $.intermediate_name),
-      '>',
-      optional(field('out_macro', $.macro_block)),
+      choice(
+        seq(
+          '<',
+          optional(field('input', $.intermediate_name)),
+          ':',
+          field('name', $.intermediate_name),
+          '>',
+        ),
+        // Sub-recipe input: reuses the `<+` sigil, so `<+leavan:dough>` is a
+        // declaration and `<+leavan>` stays a sub-recipe reference (the `:`
+        // before `>` — absent from `recipe_name` — settles which).
+        seq(
+          '<+',
+          field('sub_input', $.recipe_name),
+          ':',
+          field('name', $.intermediate_name),
+          '>',
+        ),
+      ),
+      optional(field('out_amount', $.amount_block)),
     )),
-
-    // The `[=]`/`[+]` block that gives an intermediate's amount when its input is
-    // named inline (`<parsley:chopped parsley>[=]`).
-    macro_block: $ => seq('[', $.amount_macro, ']'),
 
     // A name inside an intermediate declaration: like `ingredient_name` but it
     // may not contain a `:` (which separates input from output) or start with a
