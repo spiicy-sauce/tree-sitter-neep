@@ -8,6 +8,10 @@
       "required": false,
       "types": [
         {
+          "type": "amount_macro",
+          "named": true
+        },
+        {
           "type": "basis_member",
           "named": true
         },
@@ -21,6 +25,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "amount_macro",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "basis_decl",
@@ -266,6 +275,48 @@
     }
   },
   {
+    "type": "intermediate_ref",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "intermediate_with_amount",
+    "named": true,
+    "fields": {
+      "amount": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "amount_block",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "ingredient_name",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "kv_line",
     "named": true,
     "fields": {
@@ -441,6 +492,14 @@
           "named": true
         },
         {
+          "type": "intermediate_ref",
+          "named": true
+        },
+        {
+          "type": "intermediate_with_amount",
+          "named": true
+        },
+        {
           "type": "literal",
           "named": true
         },
@@ -582,6 +641,10 @@
     "named": false
   },
   {
+    "type": "+",
+    "named": false
+  },
+  {
     "type": ",",
     "named": false
   },
@@ -610,7 +673,15 @@
     "named": false
   },
   {
+    "type": "<:",
+    "named": false
+  },
+  {
     "type": "<~",
+    "named": false
+  },
+  {
+    "type": "=",
     "named": false
   },
   {

@@ -170,14 +170,19 @@ module.exports = grammar({
     //   `75%flour`   → basis_ref      (a percentage of a basis total)
     //   `3 cloves`,
     //   `pinch`, `2` → plain_amount   (a literal amount)
+    //   `=`          → amount_macro   (passthrough: equal to input amount)
+    //   `+`          → amount_macro   (sum: sum of all inputs in paragraph)
     //
     // Canonically a plain amount is `<number> <unit>` (single space) or a
     // bare unit (`pinch`), and a basis amount is `<number>% <basis>` /
     // `<number>% *<basis>` (single space, `%` glued to the number). The glued
     // forms (`3cloves`, `100%flour`, `10%*flour`) are accepted but warned about
     // by the semantic layer and fixed by the formatter.
-    amount_block: $ => seq('[', optional($._amount), ']'),
+    amount_block: $ => seq('[', optional(choice($._amount, $.amount_macro)), ']'),
     _amount: $ => choice($.basis_member, $.basis_ref, $.plain_amount),
+
+    // Amount macros for intermediates: `=` (passthrough) or `+` (sum).
+    amount_macro: $ => choice('=', '+'),
     _basis_amount: $ => choice($.basis_member, $.basis_ref),
 
     // The percentage admits a missing integer part (`.5%`) or fractional part
@@ -199,10 +204,10 @@ module.exports = grammar({
     // to by a relative path (`<+breads/poolish>`, `<+../shared/starter>`); the
     // loader resolves it against the referring file's directory.
     recipe_name: $ => token(/[^\s()\[\]<>{}~*+!@%]+/),
-    // The leading character may not be a reference sigil (`+ ! $ #`), so that
-    // `<+name>`, `<!name>`, `<$name>`, and `<#name>` are unambiguously
-    // sub-recipe, equipment, group, and anchor references.
-    ingredient_name: $ => token(/[^>\r\n+!$#][^>\r\n]*/),
+    // The leading character may not be a reference sigil (`+ ! : #`), so that
+    // `<+name>`, `<!name>`, `<:name>`, and `<#name>` are unambiguously
+    // sub-recipe, equipment, intermediate, and anchor references.
+    ingredient_name: $ => token(/[^>\r\n+!:$#][^>\r\n]*/),
 
     mapping_group: $ => seq('(', $.mapping_list, ')'),
     mapping_list: $ => seq($.mapping, repeat(seq(',', $.mapping))),
@@ -240,9 +245,11 @@ module.exports = grammar({
 
     _prose_token: $ => choice(
       $.ingredient_with_amount,
+      $.intermediate_with_amount,
       $.sub_recipe_ref,
       $.equipment_ref,
       $.hash_link,
+      $.intermediate_ref,
       $.ingredient_ref,
       $.timer,
       $.target,
@@ -281,6 +288,22 @@ module.exports = grammar({
     // <whole wheat flour>
     ingredient_ref: $ => seq(
       '<',
+      field('name', $.ingredient_name),
+      '>',
+    ),
+
+    // [=]<:chopped parsley>  — intermediate with passthrough amount
+    // [2 tbsp]<:lemon juice> — intermediate with explicit amount
+    intermediate_with_amount: $ => seq(
+      field('amount', $.amount_block),
+      '<:',
+      field('name', $.ingredient_name),
+      '>',
+    ),
+
+    // <:spice mix> — reference to a previously declared intermediate
+    intermediate_ref: $ => seq(
+      '<:',
       field('name', $.ingredient_name),
       '>',
     ),

@@ -19,6 +19,9 @@
   (plain_amount)
 ] @number
 
+; Amount macros (`=` passthrough, `+` sum) are like keywords.
+(amount_macro) @keyword
+
 ; ── Names ────────────────────────────────────────────────────────────
 (basis_name) @type
 (recipe_name) @function
@@ -28,6 +31,10 @@
 ; pattern overrides the generic `ingredient_name` above).
 (hash_link name: (ingredient_name) @function)
 (header_anchor name: (ingredient_name) @function)
+
+; Intermediates are like labels (derived/transformed ingredients).
+(intermediate_ref name: (ingredient_name) @label)
+(intermediate_with_amount name: (ingredient_name) @label)
 
 ; ── Inline step tokens ───────────────────────────────────────────────
 (timer) @constant.builtin
@@ -48,6 +55,7 @@
 "<~" @punctuation.special
 "<+" @punctuation.special
 "<!" @punctuation.special
+"<:" @punctuation.special
 "<#" @punctuation.special
 ":" @punctuation.delimiter
 "," @punctuation.delimiter
