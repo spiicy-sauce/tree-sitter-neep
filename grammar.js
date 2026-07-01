@@ -205,9 +205,11 @@ module.exports = grammar({
     // loader resolves it against the referring file's directory.
     recipe_name: $ => token(/[^\s()\[\]<>{}~*+!@%]+/),
     // The leading character may not be a reference sigil (`+ ! : #`), so that
-    // `<+name>`, `<!name>`, `<:name>`, and `<#name>` are unambiguously
-    // sub-recipe, equipment, intermediate, and anchor references.
-    ingredient_name: $ => token(/[^>\r\n+!:$#][^>\r\n]*/),
+    // `<+name>`, `<!name>`, and `<#name>` are unambiguously sub-recipe,
+    // equipment, and anchor references. A `:` may not appear at all: inside
+    // `<…>` it separates an intermediate's input from its name, so an ordinary
+    // ingredient reference never contains one.
+    ingredient_name: $ => token(/[^>\r\n+!:$#][^>\r\n:]*/),
 
     mapping_group: $ => seq('(', $.mapping_list, ')'),
     mapping_list: $ => seq($.mapping, repeat(seq(',', $.mapping))),
@@ -244,12 +246,11 @@ module.exports = grammar({
     ),
 
     _prose_token: $ => choice(
+      $.intermediate_decl,
       $.ingredient_with_amount,
-      $.intermediate_with_amount,
       $.sub_recipe_ref,
       $.equipment_ref,
       $.hash_link,
-      $.intermediate_ref,
       $.ingredient_ref,
       $.timer,
       $.target,
@@ -292,21 +293,38 @@ module.exports = grammar({
       '>',
     ),
 
-    // [=]<:chopped parsley>  — intermediate with passthrough amount
-    // [2 tbsp]<:lemon juice> — intermediate with explicit amount
-    intermediate_with_amount: $ => seq(
-      field('amount', $.amount_block),
-      '<:',
-      field('name', $.ingredient_name),
+    // An intermediate DECLARATION — a product made mid-recipe, marked by the
+    // `:` inside `<…>`. Two shapes:
+    //   [1 tbsp]<:lemon juice>            output form: the prefix amount is the
+    //                                     intermediate's own amount.
+    //   [1 tbsp]<parsley:chopped parsley>[=]
+    //                                     input/output form: `parsley` (before
+    //                                     the colon) is a named input consumed
+    //                                     inline, the prefix amount is the
+    //                                     input's amount, and the trailing
+    //                                     `[=]`/`[+]` macro is the intermediate's
+    //                                     amount (passthrough / sum of inputs).
+    // Both the prefix amount and the trailing macro are optional. A LATER use of
+    // the intermediate is a bare `<name>` — the same token as an ingredient
+    // reference (`ingredient_ref`); the semantic layer tells them apart by name.
+    intermediate_decl: $ => prec.right(seq(
+      optional(field('in_amount', $.amount_block)),
+      '<',
+      optional(field('input', $.intermediate_name)),
+      ':',
+      field('name', $.intermediate_name),
       '>',
-    ),
+      optional(field('out_macro', $.macro_block)),
+    )),
 
-    // <:spice mix> — reference to a previously declared intermediate
-    intermediate_ref: $ => seq(
-      '<:',
-      field('name', $.ingredient_name),
-      '>',
-    ),
+    // The `[=]`/`[+]` block that gives an intermediate's amount when its input is
+    // named inline (`<parsley:chopped parsley>[=]`).
+    macro_block: $ => seq('[', $.amount_macro, ']'),
+
+    // A name inside an intermediate declaration: like `ingredient_name` but it
+    // may not contain a `:` (which separates input from output) or start with a
+    // reference sigil.
+    intermediate_name: $ => token(/[^>\r\n+!:$#][^>\r\n:]*/),
 
     // @30m  @2-3h
     timer: $ => token(/@[^ \t\r\n.,;!?]+/),

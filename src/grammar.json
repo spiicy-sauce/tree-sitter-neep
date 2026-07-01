@@ -595,7 +595,7 @@
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "[^>\\r\\n+!:$#][^>\\r\\n]*"
+        "value": "[^>\\r\\n+!:$#][^>\\r\\n:]*"
       }
     },
     "mapping_group": {
@@ -797,11 +797,11 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "ingredient_with_amount"
+          "name": "intermediate_decl"
         },
         {
           "type": "SYMBOL",
-          "name": "intermediate_with_amount"
+          "name": "ingredient_with_amount"
         },
         {
           "type": "SYMBOL",
@@ -814,10 +814,6 @@
         {
           "type": "SYMBOL",
           "name": "hash_link"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "intermediate_ref"
         },
         {
           "type": "SYMBOL",
@@ -950,55 +946,106 @@
         }
       ]
     },
-    "intermediate_with_amount": {
+    "intermediate_decl": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "in_amount",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "amount_block"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "STRING",
+            "value": "<"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "input",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "intermediate_name"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "STRING",
+            "value": ":"
+          },
+          {
+            "type": "FIELD",
+            "name": "name",
+            "content": {
+              "type": "SYMBOL",
+              "name": "intermediate_name"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": ">"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "out_macro",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "macro_block"
+                }
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "macro_block": {
       "type": "SEQ",
       "members": [
         {
-          "type": "FIELD",
-          "name": "amount",
-          "content": {
-            "type": "SYMBOL",
-            "name": "amount_block"
-          }
+          "type": "STRING",
+          "value": "["
+        },
+        {
+          "type": "SYMBOL",
+          "name": "amount_macro"
         },
         {
           "type": "STRING",
-          "value": "<:"
-        },
-        {
-          "type": "FIELD",
-          "name": "name",
-          "content": {
-            "type": "SYMBOL",
-            "name": "ingredient_name"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": ">"
+          "value": "]"
         }
       ]
     },
-    "intermediate_ref": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "<:"
-        },
-        {
-          "type": "FIELD",
-          "name": "name",
-          "content": {
-            "type": "SYMBOL",
-            "name": "ingredient_name"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": ">"
-        }
-      ]
+    "intermediate_name": {
+      "type": "TOKEN",
+      "content": {
+        "type": "PATTERN",
+        "value": "[^>\\r\\n+!:$#][^>\\r\\n:]*"
+      }
     },
     "timer": {
       "type": "TOKEN",

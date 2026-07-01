@@ -32,9 +32,12 @@
 (hash_link name: (ingredient_name) @function)
 (header_anchor name: (ingredient_name) @function)
 
-; Intermediates are like labels (derived/transformed ingredients).
-(intermediate_ref name: (ingredient_name) @label)
-(intermediate_with_amount name: (ingredient_name) @label)
+; An intermediate declaration reads like a label (a derived/transformed
+; ingredient). Its named input (`<parsley:…>`) stays a plain ingredient. A later
+; *reference* to an intermediate is a bare `<name>`, indistinguishable from an
+; ingredient reference, so it highlights as one — by design.
+(intermediate_decl input: (intermediate_name) @variable)
+(intermediate_decl name: (intermediate_name) @label)
 
 ; ── Inline step tokens ───────────────────────────────────────────────
 (timer) @constant.builtin
@@ -55,7 +58,6 @@
 "<~" @punctuation.special
 "<+" @punctuation.special
 "<!" @punctuation.special
-"<:" @punctuation.special
 "<#" @punctuation.special
 ":" @punctuation.delimiter
 "," @punctuation.delimiter

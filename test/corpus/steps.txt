@@ -76,16 +76,13 @@ Make the poolish.
       (literal))))
 
 ==================
-Group reference and hash link in prose
+Hash link in prose
 ==================
-Mix <$dry ingredients> into the <#autolyse>.
+Fold it into the <#autolyse>.
 ------------------------------------------------------------------------
 (file
   (step_section
     (prose_line
-      (literal)
-      (group_ref
-        name: (ingredient_name))
       (literal)
       (hash_link
         name: (ingredient_name))
@@ -102,3 +99,56 @@ Section header with an anchor
       title: (header_text)
       anchor: (header_anchor
         name: (ingredient_name)))))
+
+==================
+Intermediate declaration (output form) and a bare reference
+==================
+Squeeze to get [1 tbsp]<:lemon juice>.
+Drink your <lemon juice>.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (intermediate_decl
+        in_amount: (amount_block
+          (plain_amount))
+        name: (intermediate_name))
+      (literal))
+    (prose_line
+      (literal)
+      (ingredient_ref
+        name: (ingredient_name))
+      (literal))))
+
+==================
+Intermediate declaration (input/output form) with a trailing macro
+==================
+Chop [1 tbsp]<parsley:chopped parsley>[=]
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (intermediate_decl
+        in_amount: (amount_block
+          (plain_amount))
+        input: (intermediate_name)
+        name: (intermediate_name)
+        out_macro: (macro_block
+          (amount_macro))))))
+
+==================
+Intermediate declaration with a prefixed amount macro
+==================
+Whisk [=]<:dressing> and coat.
+------------------------------------------------------------------------
+(file
+  (step_section
+    (prose_line
+      (literal)
+      (intermediate_decl
+        in_amount: (amount_block
+          (amount_macro))
+        name: (intermediate_name))
+      (literal))))

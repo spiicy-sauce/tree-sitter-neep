@@ -202,6 +202,11 @@
     }
   },
   {
+    "type": "ingredient_name",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "ingredient_ref",
     "named": true,
     "fields": {
@@ -275,31 +280,25 @@
     }
   },
   {
-    "type": "intermediate_ref",
+    "type": "intermediate_decl",
     "named": true,
     "fields": {
-      "name": {
+      "in_amount": {
         "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "ingredient_name",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "intermediate_with_amount",
-    "named": true,
-    "fields": {
-      "amount": {
-        "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "amount_block",
+            "named": true
+          }
+        ]
+      },
+      "input": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "intermediate_name",
             "named": true
           }
         ]
@@ -309,12 +308,27 @@
         "required": true,
         "types": [
           {
-            "type": "ingredient_name",
+            "type": "intermediate_name",
+            "named": true
+          }
+        ]
+      },
+      "out_macro": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "macro_block",
             "named": true
           }
         ]
       }
     }
+  },
+  {
+    "type": "intermediate_name",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "kv_line",
@@ -340,6 +354,21 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "macro_block",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "amount_macro",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -492,11 +521,7 @@
           "named": true
         },
         {
-          "type": "intermediate_ref",
-          "named": true
-        },
-        {
-          "type": "intermediate_with_amount",
+          "type": "intermediate_decl",
           "named": true
         },
         {
@@ -673,10 +698,6 @@
     "named": false
   },
   {
-    "type": "<:",
-    "named": false
-  },
-  {
     "type": "<~",
     "named": false
   },
@@ -710,10 +731,6 @@
   },
   {
     "type": "header_text",
-    "named": true
-  },
-  {
-    "type": "ingredient_name",
     "named": true
   },
   {
