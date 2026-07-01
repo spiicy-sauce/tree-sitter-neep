@@ -263,11 +263,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "group_decl"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "group_label"
+            "name": "ingredient_label"
           },
           {
             "type": "SYMBOL",
@@ -454,32 +450,7 @@
         }
       ]
     },
-    "group_decl": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "<$"
-        },
-        {
-          "type": "FIELD",
-          "name": "name",
-          "content": {
-            "type": "SYMBOL",
-            "name": "ingredient_name"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": ">"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_eol"
-        }
-      ]
-    },
-    "group_label": {
+    "ingredient_label": {
       "type": "SEQ",
       "members": [
         {
@@ -816,10 +787,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "group_ref"
-        },
-        {
-          "type": "SYMBOL",
           "name": "hash_link"
         },
         {
@@ -896,27 +863,6 @@
         {
           "type": "STRING",
           "value": "<!"
-        },
-        {
-          "type": "FIELD",
-          "name": "name",
-          "content": {
-            "type": "SYMBOL",
-            "name": "ingredient_name"
-          }
-        },
-        {
-          "type": "STRING",
-          "value": ">"
-        }
-      ]
-    },
-    "group_ref": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "<$"
         },
         {
           "type": "FIELD",

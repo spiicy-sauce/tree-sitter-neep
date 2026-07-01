@@ -119,54 +119,6 @@
     }
   },
   {
-    "type": "group_decl",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "ingredient_name",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "group_label",
-    "named": true,
-    "fields": {
-      "text": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "label_text",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "group_ref",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "ingredient_name",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "hash_link",
     "named": true,
     "fields": {
@@ -225,6 +177,22 @@
     }
   },
   {
+    "type": "ingredient_label",
+    "named": true,
+    "fields": {
+      "text": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "label_text",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
     "type": "ingredient_ref",
     "named": true,
     "fields": {
@@ -257,15 +225,11 @@
           "named": true
         },
         {
-          "type": "group_decl",
-          "named": true
-        },
-        {
-          "type": "group_label",
-          "named": true
-        },
-        {
           "type": "ingredient",
+          "named": true
+        },
+        {
+          "type": "ingredient_label",
           "named": true
         },
         {
@@ -465,10 +429,6 @@
           "named": true
         },
         {
-          "type": "group_ref",
-          "named": true
-        },
-        {
           "type": "hash_link",
           "named": true
         },
@@ -643,10 +603,6 @@
   },
   {
     "type": "<#",
-    "named": false
-  },
-  {
-    "type": "<$",
     "named": false
   },
   {

@@ -8,9 +8,9 @@
 (kv_line value: (value) @string)
 (equipment_line name: (ingredient_name) @type)
 
-; ── Section headers / group labels ───────────────────────────────────
+; ── Section headers / ingredient labels ─────────────────────────────
 (section_header title: (header_text) @markup.heading)
-(group_label text: (label_text) @markup.heading)
+(ingredient_label text: (label_text) @markup.heading)
 
 ; ── Amounts ──────────────────────────────────────────────────────────
 [
@@ -24,10 +24,8 @@
 (recipe_name) @function
 (ingredient_name) @variable
 
-; Groups and header anchors read like sub-recipes (a later, more specific
+; Header anchors read like sub-recipes (a later, more specific
 ; pattern overrides the generic `ingredient_name` above).
-(group_decl name: (ingredient_name) @function)
-(group_ref name: (ingredient_name) @function)
 (hash_link name: (ingredient_name) @function)
 (header_anchor name: (ingredient_name) @function)
 
@@ -50,7 +48,6 @@
 "<~" @punctuation.special
 "<+" @punctuation.special
 "<!" @punctuation.special
-"<$" @punctuation.special
 "<#" @punctuation.special
 ":" @punctuation.delimiter
 "," @punctuation.delimiter

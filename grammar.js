@@ -107,8 +107,7 @@ module.exports = grammar({
       $.basis_decl,
       $.sub_recipe,
       $.ingredient,
-      $.group_decl,
-      $.group_label,
+      $.ingredient_label,
       $.blank_line,
     )),
 
@@ -159,17 +158,7 @@ module.exports = grammar({
       $._eol,
     ),
 
-    // <$dry ingredients> — names a group of the ingredient lines that follow it
-    // up to the next blank line (the membership boundary is line-positional, so
-    // the semantic layer assembles it).
-    group_decl: $ => seq(
-      '<$',
-      field('name', $.ingredient_name),
-      '>',
-      $._eol,
-    ),
-
-    group_label: $ => seq(
+    ingredient_label: $ => seq(
       field('text', $.label_text),
       $._eol,
     ),
@@ -253,7 +242,6 @@ module.exports = grammar({
       $.ingredient_with_amount,
       $.sub_recipe_ref,
       $.equipment_ref,
-      $.group_ref,
       $.hash_link,
       $.ingredient_ref,
       $.timer,
@@ -279,13 +267,6 @@ module.exports = grammar({
     // <!dutch oven>
     equipment_ref: $ => seq(
       '<!',
-      field('name', $.ingredient_name),
-      '>',
-    ),
-
-    // <$dry ingredients> — references every ingredient in the named group.
-    group_ref: $ => seq(
-      '<$',
       field('name', $.ingredient_name),
       '>',
     ),
